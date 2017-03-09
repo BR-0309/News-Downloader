@@ -1,0 +1,41 @@
+group 'raison.benjamin.newsDownloader'
+def versionFile = new File('version.properties')
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+build {
+    def file = file(versionFile)
+    if (file.canRead()) {
+        Properties props = new Properties()
+        props.load(versionFile.newDataInputStream())
+        version = new Integer(props.getProperty('version').toInteger() + 1).toString()
+        props.setProperty('version', version)
+        props.store(versionFile.newWriter(), null)
+    } else {
+        throw new GradleException("Can't read version.properties!")
+    }
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.jsoup:jsoup:1.10.2'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.5'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
