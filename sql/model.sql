@@ -30,7 +30,7 @@ foreign key (source_id) references source(id)
 create table parse_rule(
 id int not null primary key auto_increment,
 section_id int not null,
-class varchar(255) not null,
+css_selector varchar(255) not null,
 text_tag varchar(16),
 exclude_urls varchar(4048),
 foreign key (section_id) references section(id)

@@ -12,6 +12,15 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 package raison.benjamin.newsDownloader;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 public class TestMain {
+    
+    @Test
+    public void test() {
+        Assert.assertEquals(5, 2 + 3);
+    }
     
 }

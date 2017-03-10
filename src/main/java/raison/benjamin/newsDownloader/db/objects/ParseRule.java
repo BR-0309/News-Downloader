@@ -4,14 +4,14 @@ public class ParseRule {
     
     private int id;
     private Section section;
-    private String cssClass;
+    private String cssSelector;
     private String textTag;
     private String[] excludeUrls;
     
-    public ParseRule(int id, Section section, String cssClass, String textTag, String excludeUrls) {
+    public ParseRule(int id, Section section, String cssSelector, String textTag, String excludeUrls) {
         this.id = id;
         this.section = section;
-        this.cssClass = cssClass;
+        this.cssSelector = cssSelector;
         this.textTag = textTag;
         if (excludeUrls != null) {
             this.excludeUrls = excludeUrls.split(";");
@@ -37,12 +37,12 @@ public class ParseRule {
         this.section = section;
     }
     
-    public String getCssClass() {
-        return cssClass;
+    public String getCssSelector() {
+        return cssSelector;
     }
     
-    public void setCssClass(String cssClass) {
-        this.cssClass = cssClass;
+    public void setCssSelector(String cssSelector) {
+        this.cssSelector = cssSelector;
     }
     
     public String getTextTag() {

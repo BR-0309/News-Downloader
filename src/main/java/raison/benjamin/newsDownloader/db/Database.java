@@ -49,12 +49,13 @@ public class Database {
     public static List<ParseRule> getParseRules() {
         List<ParseRule> list = new ArrayList<>();
         try {
-            String sql = "select parse_rule.id, parse_rule.class, parse_rule.text_tag, parse_rule.exclude_urls, " +
-                         "section.id, section.name, section.name, section.url, " +
-                         "source.id, source.name, source.homepage, " + "language.id, language.name, " +
-                         "country.id, country.name " + "from parse_rule join section on section_id=section.id " +
-                         "join source on source_id=source.id " + "join language on language_id=language.id " +
-                         "join country on country_id=country.id;";
+            String sql =
+                    "select parse_rule.id, parse_rule.css_selector, parse_rule.text_tag, parse_rule.exclude_urls, " +
+                    "section.id, section.name, section.name, section.url, " +
+                    "source.id, source.name, source.homepage, " + "language.id, language.name, " +
+                    "country.id, country.name " + "from parse_rule join section on section_id=section.id " +
+                    "join source on source_id=source.id " + "join language on language_id=language.id " +
+                    "join country on country_id=country.id;";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet result = statement.executeQuery();
             while (result.next()) {
@@ -64,7 +65,8 @@ public class Database {
                                            result.getString("source.homepage"), language, country);
                 Section section = new Section(result.getInt("section.id"), result.getString("section.name"),
                                               result.getString("section.url"), source);
-                ParseRule rule = new ParseRule(result.getInt("parse_rule.id"), section, result.getString("class"),
+                ParseRule rule = new ParseRule(result.getInt("parse_rule.id"), section,
+                                               result.getString("css_selector"),
                                                result.getString("text_tag"), result.getString("exclude_urls"));
                 list.add(rule);
             }

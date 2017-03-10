@@ -28,6 +28,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             parseAll();
+            //downloadTest2();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -37,21 +38,28 @@ public class Main {
     private static void parseAll() throws IOException {
         System.out.println("Starting download...");
         for (ParseRule rule : Database.getParseRules()) {
-            System.out.println("Retrieving " + rule.getSection().getUrl());
+            System.out.println("============\nRetrieving " + rule.getSection().getUrl());
             Document document = Jsoup.connect(rule.getSection().getUrl()).get();
             makeLinksAbsolute(document);
-            System.out.println("Retrieved!");
-            Elements classes = document.getElementsByClass(rule.getCssClass());
+            System.out.println("Retrieved " + rule.getSection().getUrl());
+            Elements classes = document.select(rule.getCssSelector());
             for (Element e : classes) {
-                String title = e.text();
+                String title = e.text().trim();
                 String url;
                 boolean insert = true;
                 if (rule.getTextTag() == null) {
                     url = e.attr("href");
-                } else if (rule.getTextTag().equals("parent")) {
-                    url = e.parents().get(0).attr("href");
+                } else if (rule.getTextTag().equals("self_parent")) {
+                    if (e.attr("href").isEmpty()) {
+                        url = e.parents().get(0).attr("href");
+                    } else {
+                        url = e.attr("href");
+                    }
                 } else {
                     url = e.attr("href");
+                }
+                if (url.isEmpty()) {
+                    continue;
                 }
                 for (String pattern : rule.getExcludeUrls()) {
                     if (pattern.endsWith("*")) {
@@ -68,15 +76,36 @@ public class Main {
                     Database.insertNewsStory(title, url, rule.getSection().getSource());
                 }
             }
+            System.out.println("Parsed " + rule.getSection().getUrl());
         }
         System.out.println("Done!");
     }
     
+    private static void downloadTest2() {
+        System.out.println(":" + "\t".trim());
+        try {
+            Document document = Jsoup.connect("http://www.francetvinfo.fr/societe/").get();
+            makeLinksAbsolute(document);
+            Elements titles = document.select(".col-2 a");
+            for (Element e : titles) {
+                String url;
+                if (e.attr("href").equals("")) {
+                    url = e.parents().get(0).attr("href");
+                } else {
+                    url = e.attr("href");
+                }
+                if (!e.text().trim().isEmpty()) {
+                    System.out.println(e.text().trim() + "\t" + url);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     private static void makeLinksAbsolute(Document document) {
         Elements elements = document.getAllElements();
         for (Element e : elements) {
-            //if (!e.parent().is("span") && !e.parent().is("li")) {
             if (e.is("a") || e.is("link")) {
                 e.attr("href", e.absUrl("href"));
             } else if (e.is("img")) {
