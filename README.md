@@ -1,2 +1,2 @@
 # News-Downloader
-Part of the back-end for Resonator
+Part of the back-end for Resonance
