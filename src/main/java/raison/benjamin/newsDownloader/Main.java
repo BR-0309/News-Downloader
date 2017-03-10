@@ -1,3 +1,16 @@
+/*
+ * Copyright 2017 Benjamin Raison
+ *
+ * Licensed under the Apache License,Version2.0(the"License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,software distributed under the License is distributed on an"AS IS"BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
+ */
 package raison.benjamin.newsDownloader;
 
 import org.jsoup.Jsoup;
@@ -55,83 +68,12 @@ public class Main {
                     Database.insertNewsStory(title, url, rule.getSection().getSource());
                 }
             }
-            /*
-            if(rule.getTextTag() == null) {
-                for (Element e : classes) {
-                    String title = e.text();
-                    Database.insertNewsStory(title, e.parents().get(0).attr("href"), rule.getSection().getSource());
-                }
-            }else {
-                for (Element e : classes) {
-                    String title = e.getElementsByTag(rule.getTextTag()).get(0).text();
-                    Database.insertNewsStory(title, e.attr("href"), rule.getSection().getSource());
-                }
-            }*/
         }
         System.out.println("Done!");
     }
     
-    /*
-    * Main page
-    * gs-o-faux-block-link -> h3
-    *
-    * Any other
-    * title-link__title -> text()
-    * */
-    private static void downloadTest2() {
-        // There was this title__something span or div or something. Whatever it was, use that.
-        try {
-            Document document = Jsoup.connect("http://www.faz.net").get();
-            makeLinksAbsolute(document);
-            //Elements titles = document.getElementsByClass("gs-o-faux-block-link");
-            Elements titles = document.getElementsByClass("TeaserHeadLink");
-            for (Element e : titles) {
-                System.out.println(e.text() + "\t" + e.attr("href"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     
-    /*private static void downloadTest() {
-        try {
-            Source source = new SourceJDBCDao().findSourceByID(1);
-            for (Subsection subsection : new SubsectionJDBCDao().getSubsections(source)) {
-                String match = subsection.getUrl().substring(0, subsection.getUrl().length() - 1);
-                System.out.println(match);
-                Document document = document = Jsoup.connect(subsection.getUrl()).get();
-                makeLinksAbsolute(document);
-                Element main = document.getElementsByClass("container--primary-and-secondary-columns column-clearfix")
-                                       .get(0);
-                NewsStoryJDBDao dao = new NewsStoryJDBDao();
-                for (Element e : main.select("a[href]")) {
-                    if (!e.parent().is("span") && !e.parent().is("li") && e.html().startsWith("<") &&
-                        e.attr("href").matches(".*\\d$") && e.attr("href").startsWith(match)) {
-                        String url = e.attr("href");
-                        System.out.println("Get: " + url);
-                        String title = e.getElementsByTag("h3").get(0).text();
-                        String content = getHtmlFromURL(url);
-                        NewsStory story = new NewsStory(0, title, new Timestamp(System.currentTimeMillis()), url, subsection, null);
-                        dao.insertNewsStory(story);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    private static String getHtmlFromURL(String url) {
-        try {
-            Document document = Jsoup.connect(url).get();
-            makeLinksAbsolute(document);
-            return document.outerHtml();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-    
-    public static void makeLinksAbsolute(Document document) {
+    private static void makeLinksAbsolute(Document document) {
         Elements elements = document.getAllElements();
         for (Element e : elements) {
             //if (!e.parent().is("span") && !e.parent().is("li")) {

@@ -1,4 +1,0 @@
-RootURL:http://www.bbc.com/news/
-RootClass:gel-wrap gs-u-pt+
-RootID:
-ExcludeParents:span;li
