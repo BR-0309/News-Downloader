@@ -26,13 +26,16 @@ url varchar(2083) not null,
 source_id int not null,
 foreign key (source_id) references source(id)
 );
-
+create table exclude_urls(
+id int not null primary key auto_increment,
+url varchar(2084) not null
+);
 create table parse_rule(
 id int not null primary key auto_increment,
 section_id int not null,
 css_selector varchar(255) not null,
-text_tag varchar(16),
-exclude_urls varchar(4048),
+text_selector varchar(32),
+url_selector varchar(32),
 foreign key (section_id) references section(id)
 );
 
@@ -41,6 +44,6 @@ id int not null primary key auto_increment,
 title varchar(250) not null,
 recorded timestamp not null default current_timestamp(),
 url varchar(2083) not null,
-source_id int not null,
-foreign key (source_id) references source(id)
+section_id int not null,
+foreign key (section_id) references section(id)
 );

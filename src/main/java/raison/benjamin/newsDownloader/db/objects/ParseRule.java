@@ -5,20 +5,15 @@ public class ParseRule {
     private int id;
     private Section section;
     private String cssSelector;
-    private String textTag;
-    private String[] excludeUrls;
+    private String textSelector;
+    private String urlSelector;
     
-    public ParseRule(int id, Section section, String cssSelector, String textTag, String excludeUrls) {
+    public ParseRule(int id, Section section, String cssSelector, String textSelector, String urlSelector) {
         this.id = id;
         this.section = section;
         this.cssSelector = cssSelector;
-        this.textTag = textTag;
-        if (excludeUrls != null) {
-            this.excludeUrls = excludeUrls.split(";");
-        } else {
-            this.excludeUrls = new String[]{};
-        }
-        
+        this.textSelector = textSelector;
+        this.urlSelector = urlSelector;
     }
     
     public int getId() {
@@ -45,19 +40,19 @@ public class ParseRule {
         this.cssSelector = cssSelector;
     }
     
-    public String getTextTag() {
-        return textTag;
+    public String getTextSelector() {
+        return textSelector;
     }
     
-    public void setTextTag(String textTag) {
-        this.textTag = textTag;
+    public void setTextSelector(String textSelector) {
+        this.textSelector = textSelector;
     }
     
-    public String[] getExcludeUrls() {
-        return excludeUrls;
+    public String getUrlSelector() {
+        return urlSelector;
     }
     
-    public void setExcludeUrls(String[] excludeUrls) {
-        this.excludeUrls = excludeUrls;
+    public void setUrlSelector(String urlSelector) {
+        this.urlSelector = urlSelector;
     }
 }

@@ -8,15 +8,15 @@ public class NewsStory {
     private String title;
     private Timestamp recorded;
     private String url;
-    private Source source;
+    private Section source;
     
-    public NewsStory(String title, String url, Source source) {
+    public NewsStory(String title, String url, Section source) {
         this.title = title;
         this.url = url;
         this.source = source;
     }
     
-    public NewsStory(String title, Timestamp recorded, String url, Source source) {
+    public NewsStory(String title, Timestamp recorded, String url, Section source) {
         this.title = title;
         this.recorded = recorded;
         this.url = url;
@@ -55,11 +55,12 @@ public class NewsStory {
         this.url = url;
     }
     
-    public Source getSource() {
+    
+    public Section getSource() {
         return source;
     }
     
-    public void setSource(Source source) {
+    public void setSource(Section source) {
         this.source = source;
     }
 }

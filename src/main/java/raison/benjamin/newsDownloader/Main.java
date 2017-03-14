@@ -19,88 +19,111 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import raison.benjamin.newsDownloader.db.ConnectionFactory;
 import raison.benjamin.newsDownloader.db.Database;
+import raison.benjamin.newsDownloader.db.objects.NewsStory;
 import raison.benjamin.newsDownloader.db.objects.ParseRule;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     
     public static void main(String[] args) {
         try {
             parseAll();
-            //downloadTest2();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         ConnectionFactory.getInstance().closeConnection();
+        System.out.println("Goodbye! o/");
     }
     
     private static void parseAll() throws IOException {
-        System.out.println("Starting download...");
+        List<String> excludeUrls = Database.getExcludedURLs();
         for (ParseRule rule : Database.getParseRules()) {
-            System.out.println("============\nRetrieving " + rule.getSection().getUrl());
+            System.out.println("Fetching " + rule.getSection().getUrl());
             Document document = Jsoup.connect(rule.getSection().getUrl()).get();
-            makeLinksAbsolute(document);
-            System.out.println("Retrieved " + rule.getSection().getUrl());
-            Elements classes = document.select(rule.getCssSelector());
-            for (Element e : classes) {
-                String title = e.text().trim();
-                String url;
-                boolean insert = true;
-                if (rule.getTextTag() == null) {
-                    url = e.attr("href");
-                } else if (rule.getTextTag().equals("self_parent")) {
-                    if (e.attr("href").isEmpty()) {
-                        url = e.parents().get(0).attr("href");
-                    } else {
-                        url = e.attr("href");
-                    }
-                } else {
-                    url = e.attr("href");
-                }
-                if (url.isEmpty()) {
-                    continue;
-                }
-                for (String pattern : rule.getExcludeUrls()) {
-                    if (pattern.endsWith("*")) {
-                        if (url.startsWith(pattern.substring(0, pattern.length() - 1))) {
-                            insert = false;
-                            break;
-                        }
-                    } else if (url.equals(pattern)) {
-                        insert = false;
-                        break;
-                    }
-                }
-                if (insert) {
-                    Database.insertNewsStory(title, url, rule.getSection().getSource());
-                }
+            System.out.println("Parsing...");
+            for (NewsStory story : parseDocument(document, rule, excludeUrls)) {
+                Database.insertNewsStory(story);
             }
-            System.out.println("Parsed " + rule.getSection().getUrl());
         }
-        System.out.println("Done!");
     }
     
-    private static void downloadTest2() {
-        System.out.println(":" + "\t".trim());
-        try {
-            Document document = Jsoup.connect("http://www.francetvinfo.fr/societe/").get();
-            makeLinksAbsolute(document);
-            Elements titles = document.select(".col-2 a");
-            for (Element e : titles) {
-                String url;
-                if (e.attr("href").equals("")) {
-                    url = e.parents().get(0).attr("href");
-                } else {
-                    url = e.attr("href");
-                }
-                if (!e.text().trim().isEmpty()) {
-                    System.out.println(e.text().trim() + "\t" + url);
+    private static List<NewsStory> parseDocument(Document document, ParseRule rule, List<String> ignoreUrls) {
+        List<NewsStory> list = new ArrayList<>();
+        makeLinksAbsolute(document);
+        Elements classes = document.select(rule.getCssSelector());
+        for (Element e : classes) {
+            String title = getTextBySelector(e, rule.getTextSelector());
+            String url = getAttrBySelector(e, "href", rule.getUrlSelector());
+            boolean valid = true;
+            for (String s : ignoreUrls) {
+                if (s.endsWith("*")) {
+                    if (url.startsWith(s.substring(0, s.length() - 1))) {
+                        valid = false;
+                        break;
+                    }
+                } else if (s.equals(url)) {
+                    valid = false;
+                    break;
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (url.isEmpty()) {
+                System.err.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
+                valid = false;
+            }
+            if (valid) {
+                list.add(new NewsStory(title, url, rule.getSection()));
+            }
         }
+        return list;
+    }
+    
+    private static String getAttrBySelector(Element element, String attr, String selector) {
+        String url;
+        switch (selector) {
+            case "self":
+                url = element.attr(attr);
+                break;
+            case "parent":
+                url = element.parent().attr(attr);
+                break;
+            case "self_parent":
+                if (!element.attr(attr).isEmpty()) {
+                    url = element.attr(attr);
+                } else {
+                    url = element.parent().attr(attr);
+                }
+                break;
+            default:
+                url = element.select(selector).get(0).attr(attr);
+                break;
+        }
+        return url;
+    }
+    
+    private static String getTextBySelector(Element element, String selector) {
+        String url;
+        switch (selector) {
+            case "self":
+                url = element.text().trim();
+                break;
+            case "parent":
+                url = element.parent().text().trim();
+                break;
+            case "self_parent":
+                if (!element.text().trim().isEmpty()) {
+                    url = element.text().trim();
+                } else {
+                    url = element.parent().text().trim();
+                }
+                break;
+            default:
+                url = element.select(selector).get(0).text().trim();
+                break;
+        }
+        return url;
     }
     
     private static void makeLinksAbsolute(Document document) {
@@ -113,5 +136,4 @@ public class Main {
             }
         }
     }
-    
 }

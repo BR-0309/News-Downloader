@@ -18,7 +18,7 @@ public class Database {
             return;
         }
         try {
-            String sql = "insert into news_story (title, url, source_id) values (?,?,?);";
+            String sql = "insert into news_story (title, url, section_id) values (?,?,?);";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, story.getTitle());
             statement.setString(2, story.getUrl());
@@ -29,8 +29,8 @@ public class Database {
         }
     }
     
-    public static void insertNewsStory(String title, String url, Source source) {
-        insertNewsStory(new NewsStory(title, url, source));
+    public static void insertNewsStory(String title, String url, Section section) {
+        insertNewsStory(new NewsStory(title, url, section));
     }
     
     public static boolean containsNewsStoryUrl(String url) {
@@ -50,7 +50,7 @@ public class Database {
         List<ParseRule> list = new ArrayList<>();
         try {
             String sql =
-                    "select parse_rule.id, parse_rule.css_selector, parse_rule.text_tag, parse_rule.exclude_urls, " +
+                    "select parse_rule.id, parse_rule.css_selector, parse_rule.text_selector, parse_rule.url_selector, " +
                     "section.id, section.name, section.name, section.url, " +
                     "source.id, source.name, source.homepage, " + "language.id, language.name, " +
                     "country.id, country.name " + "from parse_rule join section on section_id=section.id " +
@@ -66,9 +66,24 @@ public class Database {
                 Section section = new Section(result.getInt("section.id"), result.getString("section.name"),
                                               result.getString("section.url"), source);
                 ParseRule rule = new ParseRule(result.getInt("parse_rule.id"), section,
-                                               result.getString("css_selector"),
-                                               result.getString("text_tag"), result.getString("exclude_urls"));
+                                               result.getString("css_selector"), result.getString("text_selector"),
+                                               result.getString("url_selector"));
                 list.add(rule);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static List<String> getExcludedURLs() {
+        List<String> list = new ArrayList<>();
+        try {
+            String sql = "select url from exclude_urls;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                list.add(result.getString("url"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
