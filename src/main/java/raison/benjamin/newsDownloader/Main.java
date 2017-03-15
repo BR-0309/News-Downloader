@@ -120,7 +120,11 @@ public class Main {
                 }
                 break;
             default:
-                url = element.select(selector).get(0).text().trim();
+                if (element.select(selector).size() == 0) {
+                    url = element.attr("href");
+                } else {
+                    url = element.select(selector).get(0).text().trim();
+                }
                 break;
         }
         return url;

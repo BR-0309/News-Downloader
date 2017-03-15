@@ -2,9 +2,10 @@ insert into language (name) values ('English'),('German'),('French');
 insert into country (name) values ('United Kingdom'),('Germany'),('France'),('Switzerland');
 
 insert into source (id, name, homepage, language_id, country_id) values
-(1, 'BBC News',                'http://www.bbc.com/news',   1, 1),
-(2, 'Frankfurter Allgemeine',  'http://www.faz.net/',       2, 2),
-(3, 'SRF',                     'http://www.srf.ch/news/',   2, 4);
+(1, 'BBC News',                'http://www.bbc.com/news',                       1, 1),
+(2, 'Frankfurter Allgemeine',  'http://www.faz.net/',                           2, 2),
+(3, 'SRF',                     'http://www.srf.ch/news/',                       2, 4),
+(4, 'Daily Mail',              'http://www.dailymail.co.uk/home/index.html',    1, 1);
 
 insert into section (id, name, url, source_id) values
 (1, 'Front page',              'http://www.bbc.com/news',                               1),
@@ -50,7 +51,19 @@ insert into section (id, name, url, source_id) values
 (37, 'Economy',                'http://www.srf.ch/news/wirtschaft',                     3),
 (38, 'Infographics',           'http://www.srf.ch/news/infografik-3',                   3),
 (39, 'Sport',                  'http://www.srf.ch/sport',                               3),
-(40, 'SRF Data',               'http://www.srf.ch/news/srf-data',                       3);
+(40, 'SRF Data',               'http://www.srf.ch/news/srf-data',                       3),
+
+(41, 'Front page',             'http://www.dailymail.co.uk/home/index.html',            4),
+(42, 'UK',                     'http://www.dailymail.co.uk/news/index.html',            4),
+(43, 'US',                     'http://www.dailymail.co.uk/ushome/index.html',          4),
+(44, 'Sport',                  'http://www.dailymail.co.uk/sport/index.html',           4),
+(45, 'TV & Showbiz',           'http://www.dailymail.co.uk/tvshowbiz/index.html',       4),
+(46, 'Australia',              'http://www.dailymail.co.uk/auhome/index.html',          4),
+(47, 'Femail',                 'http://www.dailymail.co.uk/femail/index.html',          4),
+(48, 'Health',                 'http://www.dailymail.co.uk/health/index.html',          4),
+(49, 'Science',                'http://www.dailymail.co.uk/sciencetech/index.html',     4),
+(50, 'Money',                  'http://www.dailymail.co.uk/money/index.html',           4),
+(51, 'Travel',                  'http://www.dailymail.co.uk/travel/index.html',         4);
 
 insert into exclude_urls (url) values
 ('http://www.bbc.co.uk/events/*'),
@@ -78,9 +91,11 @@ insert into exclude_urls (url) values
 ('https://www.twitter.com/*'),
 ('http://foursquare.com/*'),
 ('https://www.faz.net/mein-faz-net/newsletter/'),
-('http://www.faz.net/aktuell/finanzen/boersenspiel/');
-
-
+('http://www.faz.net/aktuell/finanzen/boersenspiel/'),
+('http://feedly.com/*'),
+('http://add.my.yahoo.com/*'),
+('http://reader.aol.com/*'),
+('http://www.dailymail.co.uk/travel/index.rss');
 
 insert into parse_rule (section_id, css_selector, text_selector, url_selector) values
 (1,  '.gs-c-promo-heading', 'h3',   'self'  ),
@@ -125,4 +140,16 @@ insert into parse_rule (section_id, css_selector, text_selector, url_selector) v
 (37, '.title', 'self', 'self_parent'),
 (38, '.title', 'self', 'self_parent'),
 (39, '.title', 'self', 'self_parent'),
-(40, '.title', 'self', 'self_parent');
+(40, '.title', 'self', 'self_parent'),
+
+(41, '.linkro-darkred', 'a', 'a'),
+(42, '.linkro-darkred', 'a', 'a'),
+(43, '.linkro-darkred', 'a', 'a'),
+(44, '.linkro-darkred', 'a', 'a'),
+(45, '.linkro-darkred', 'a', 'a'),
+(46, '.linkro-darkred', 'a', 'a'),
+(47, '.linkro-darkred', 'a', 'a'),
+(48, '.linkro-darkred', 'a', 'a'),
+(49, '.linkro-darkred', 'a', 'a'),
+(50, '.linkro-darkred', 'a', 'a'),
+(51, '.linkro-darkred', 'a', 'a');
