@@ -38,7 +38,7 @@ public class Main {
         System.out.println("Goodbye! o/");
     }
     
-    private static void parseAll() throws IOException {
+    static void parseAll() throws IOException {
         List<String> excludeUrls = Database.getExcludedURLs();
         for (ParseRule rule : Database.getParseRules()) {
             System.out.println("Fetching " + rule.getSection().getUrl());
@@ -50,7 +50,7 @@ public class Main {
         }
     }
     
-    private static List<NewsStory> parseDocument(Document document, ParseRule rule, List<String> ignoreUrls) {
+    static List<NewsStory> parseDocument(Document document, ParseRule rule, List<String> ignoreUrls) {
         List<NewsStory> list = new ArrayList<>();
         makeLinksAbsolute(document);
         Elements classes = document.select(rule.getCssSelector());
@@ -80,57 +80,57 @@ public class Main {
         return list;
     }
     
-    private static String getAttrBySelector(Element element, String attr, String selector) {
-        String url;
+    static String getAttrBySelector(Element element, String attr, String selector) {
+        String attribute;
         switch (selector) {
             case "self":
-                url = element.attr(attr);
+                attribute = element.attr(attr);
                 break;
             case "parent":
-                url = element.parent().attr(attr);
+                attribute = element.parent().attr(attr);
                 break;
             case "self_parent":
                 if (!element.attr(attr).isEmpty()) {
-                    url = element.attr(attr);
+                    attribute = element.attr(attr);
                 } else {
-                    url = element.parent().attr(attr);
+                    attribute = element.parent().attr(attr);
                 }
                 break;
             default:
-                url = element.select(selector).get(0).attr(attr);
+                attribute = element.select(selector).get(0).attr(attr);
                 break;
         }
-        return url;
+        return attribute;
     }
     
-    private static String getTextBySelector(Element element, String selector) {
-        String url;
+    static String getTextBySelector(Element element, String selector) {
+        String text;
         switch (selector) {
             case "self":
-                url = element.text().trim();
+                text = element.text().trim();
                 break;
             case "parent":
-                url = element.parent().text().trim();
+                text = element.parent().text().trim();
                 break;
             case "self_parent":
                 if (!element.text().trim().isEmpty()) {
-                    url = element.text().trim();
+                    text = element.text().trim();
                 } else {
-                    url = element.parent().text().trim();
+                    text = element.parent().text().trim();
                 }
                 break;
             default:
                 if (element.select(selector).size() == 0) {
-                    url = element.attr("href");
+                    text = element.attr(selector);
                 } else {
-                    url = element.select(selector).get(0).text().trim();
+                    text = element.select(selector).get(0).text().trim();
                 }
                 break;
         }
-        return url;
+        return text;
     }
     
-    private static void makeLinksAbsolute(Document document) {
+    static void makeLinksAbsolute(Document document) {
         Elements elements = document.getAllElements();
         for (Element e : elements) {
             if (e.is("a") || e.is("link")) {
