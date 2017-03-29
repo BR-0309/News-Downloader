@@ -1,4 +1,4 @@
-package raison.benjamin.newsDownloader.db.objects;
+package li.resonance.newsDownloader.db.objects;
 
 public class ParseRule {
     

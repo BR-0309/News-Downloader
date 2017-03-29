@@ -1,19 +1,34 @@
-package raison.benjamin.newsDownloader.db;
+package li.resonance.newsDownloader.db;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class ConnectionFactory {
     private static ConnectionFactory connectionFactory = null;
     
-    private final String dbURL = "jdbc:mysql://localhost:3306/web?useSSL=true";
-    private final String dbUser = "root";
-    private final String dbPwd = "";
+    private final String dbURL = "jdbc:mysql://localhost:3306/resonance?useSSL=true";
+    private String dbUser;
+    private String dbPwd;
     
     private Connection connection = null;
     
     private ConnectionFactory() {
+        File cfg = new File("db.cfg");
+        if (!cfg.exists()) {
+            cfg = new File("/home/benji/java/db.cfg");
+        }
+        try (Scanner scan = new Scanner(cfg)) {
+            String[] parts = scan.nextLine().split(";");
+            dbUser = parts[0];
+            dbPwd = /*parts[1]*/"";
+        } catch (Exception e) {
+            System.err.println("Failed to read database configuration!\n");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
     
     public static ConnectionFactory getInstance() {

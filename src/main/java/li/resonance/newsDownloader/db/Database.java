@@ -1,49 +1,74 @@
-package raison.benjamin.newsDownloader.db;
+package li.resonance.newsDownloader.db;
 
-import raison.benjamin.newsDownloader.db.objects.*;
+import li.resonance.newsDownloader.db.objects.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
     
+    private static final Date NOW = new Date(System.currentTimeMillis());
     private static Connection connection = ConnectionFactory.getInstance().getConnection();
     
     public static void insertNewsStory(NewsStory story) {
-        if (containsNewsStoryUrl(story.getUrl())) {
-            return;
-        }
         try {
             String sql = "insert into news_story (title, url, section_id) values (?,?,?);";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, story.getTitle());
             statement.setString(2, story.getUrl());
-            statement.setInt(3, story.getSource().getId());
+            statement.setInt(3, story.getSection().getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     
-    public static void insertNewsStory(String title, String url, Section section) {
-        insertNewsStory(new NewsStory(title, url, section));
+    /**
+     * Either inserts or updates a story
+     *
+     * @param story
+     */
+    public static void registerNewsStory(NewsStory story) {
+        NewsStory fromDB = getIncompleteNewsStoryByUrl(story.getUrl());
+        if (fromDB == null) {
+            insertNewsStory(story);
+        } else {
+            if (!fromDB.getRecorded().after(NOW)) {
+                updateNewsStory(story, fromDB.getId());
+            }
+        }
     }
     
-    public static boolean containsNewsStoryUrl(String url) {
+    private static void updateNewsStory(NewsStory story, int id) {
         try {
-            String sql = "select id from news_story where url=?";
+            String sql = "UPDATE news_story SET title=?, recorded=now(), section_id=? WHERE id=?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, url);
-            ResultSet result = statement.executeQuery();
-            return result.next();
+            statement.setString(1, story.getTitle());
+            statement.setInt(2, story.getSection().getId());
+            statement.setInt(3, id);
+            statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+    }
+    
+    public static NewsStory getIncompleteNewsStoryByUrl(String url) {
+        try {
+            String sql =
+                    "SELECT news_story.id, news_story.title, news_story.url, news_story.recorded, news_story.section_id " +
+                    "FROM news_story WHERE url=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, url);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new NewsStory(result.getInt("id"), result.getString("title"), result.getTimestamp("recorded"),
+                                     result.getString("url"), null);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     
     public static List<ParseRule> getParseRules() {
@@ -51,11 +76,11 @@ public class Database {
         try {
             String sql =
                     "select parse_rule.id, parse_rule.css_selector, parse_rule.text_selector, parse_rule.url_selector, " +
-                    "section.id, section.name, section.name, section.url, " +
-                    "source.id, source.name, source.homepage, " + "language.id, language.name, " +
-                    "country.id, country.name " + "from parse_rule join section on section_id=section.id " +
-                    "join source on source_id=source.id " + "join language on language_id=language.id " +
-                    "join country on country_id=country.id;";
+                    "section.id, section.name, section.url, section.url, source.id, source.name, source.homepage, " +
+                    "language.id, language.name, " +
+                    "country.id, country.name from parse_rule join section on section_id=section.id " +
+                    "join source on source_id=source.id join language on language_id=language.id " +
+                    "join country on country_id=country.id order by parse_rule.id;";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet result = statement.executeQuery();
             while (result.next()) {

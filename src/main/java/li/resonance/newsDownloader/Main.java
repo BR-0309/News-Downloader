@@ -11,16 +11,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,either express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  */
-package raison.benjamin.newsDownloader;
+package li.resonance.newsDownloader;
 
+import li.resonance.newsDownloader.db.ConnectionFactory;
+import li.resonance.newsDownloader.db.Database;
+import li.resonance.newsDownloader.db.objects.NewsStory;
+import li.resonance.newsDownloader.db.objects.ParseRule;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import raison.benjamin.newsDownloader.db.ConnectionFactory;
-import raison.benjamin.newsDownloader.db.Database;
-import raison.benjamin.newsDownloader.db.objects.NewsStory;
-import raison.benjamin.newsDownloader.db.objects.ParseRule;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,15 +37,17 @@ public class Main {
         ConnectionFactory.getInstance().closeConnection();
         System.out.println("Goodbye! o/");
     }
-    
+
     static void parseAll() throws IOException {
         List<String> excludeUrls = Database.getExcludedURLs();
         for (ParseRule rule : Database.getParseRules()) {
             System.out.println("Fetching " + rule.getSection().getUrl());
             Document document = Jsoup.connect(rule.getSection().getUrl()).get();
             System.out.println("Parsing...");
-            for (NewsStory story : parseDocument(document, rule, excludeUrls)) {
-                Database.insertNewsStory(story);
+            List<NewsStory> stories = parseDocument(document, rule, excludeUrls);
+            System.out.println("Saving...");
+            for (NewsStory story : stories) {
+                Database.registerNewsStory(story);
             }
         }
     }
@@ -134,6 +136,7 @@ public class Main {
         Elements elements = document.getAllElements();
         for (Element e : elements) {
             if (e.is("a") || e.is("link")) {
+                if (e.attr("href").startsWith("android-app") || e.attr("href").startsWith("ios-app")) continue;
                 e.attr("href", e.absUrl("href"));
             } else if (e.is("img")) {
                 e.attr("src", e.absUrl("src"));

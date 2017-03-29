@@ -1,4 +1,4 @@
-package raison.benjamin.newsDownloader.db.objects;
+package li.resonance.newsDownloader.db.objects;
 
 import java.sql.Timestamp;
 
@@ -16,7 +16,8 @@ public class NewsStory {
         this.source = source;
     }
     
-    public NewsStory(String title, Timestamp recorded, String url, Section source) {
+    public NewsStory(int id, String title, Timestamp recorded, String url, Section source) {
+        this.id = id;
         this.title = title;
         this.recorded = recorded;
         this.url = url;
@@ -56,7 +57,7 @@ public class NewsStory {
     }
     
     
-    public Section getSource() {
+    public Section getSection() {
         return source;
     }
     
