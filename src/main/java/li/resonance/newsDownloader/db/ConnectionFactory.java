@@ -23,7 +23,7 @@ public class ConnectionFactory {
         try (Scanner scan = new Scanner(cfg)) {
             String[] parts = scan.nextLine().split(";");
             dbUser = parts[0];
-            dbPwd = /*parts[1]*/"";
+            dbPwd = parts[1];
         } catch (Exception e) {
             System.err.println("Failed to read database configuration!\n");
             e.printStackTrace();
