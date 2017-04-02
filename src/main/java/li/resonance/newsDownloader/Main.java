@@ -89,13 +89,13 @@ public class Main {
                 attribute = element.attr(attr);
                 break;
             case "parent":
-                attribute = element.parent().attr(attr);
+                attribute = getParentAttribute(element, attr);
                 break;
             case "self_parent":
                 if (!element.attr(attr).isEmpty()) {
                     attribute = element.attr(attr);
                 } else {
-                    attribute = element.parent().attr(attr);
+                    attribute = getParentAttribute(element, attr);
                 }
                 break;
             default:
@@ -103,6 +103,20 @@ public class Main {
                 break;
         }
         return attribute;
+    }
+    
+    private static String getParentAttribute(Element element, String attr) {
+        String result = element.parent().attr(attr);
+        if (result != null && !result.isEmpty()) {
+            return result;
+        }
+        for (Element parent : element.parents()) {
+            result = parent.attr(attr);
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+        }
+        return "";
     }
     
     static String getTextBySelector(Element element, String selector) {
