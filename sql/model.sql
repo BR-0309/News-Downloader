@@ -31,11 +31,11 @@ id int not null primary key auto_increment,
 url varchar(2084) not null
 );
 create table parse_rule(
-id int not null primary key auto_increment,
-section_id int not null,
-css_selector varchar(255) not null,
-text_selector varchar(32),
-url_selector varchar(32),
+  id            int not null primary key auto_increment,
+  section_id    int not null,
+  css_selector  varchar(255) not null,
+  text_selector VARCHAR(255),
+  url_selector  VARCHAR(255),
 foreign key (section_id) references section(id)
 );
 

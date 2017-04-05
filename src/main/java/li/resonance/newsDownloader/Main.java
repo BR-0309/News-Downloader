@@ -59,6 +59,12 @@ public class Main {
         for (Element e : classes) {
             String title = getTextBySelector(e, rule.getTextSelector());
             String url = getAttrBySelector(e, "href", rule.getUrlSelector());
+    
+            if (url.isEmpty()) {
+                System.err.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
+                continue;
+            }
+            
             boolean valid = true;
             for (String s : ignoreUrls) {
                 if (s.endsWith("*")) {
@@ -70,10 +76,6 @@ public class Main {
                     valid = false;
                     break;
                 }
-            }
-            if (url.isEmpty()) {
-                System.err.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
-                valid = false;
             }
             if (valid) {
                 list.add(new NewsStory(title, url, rule.getSection()));
