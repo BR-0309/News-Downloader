@@ -37,7 +37,7 @@ public class Main {
         ConnectionFactory.getInstance().closeConnection();
         System.out.println("Goodbye! o/");
     }
-
+    
     static void parseAll() throws IOException {
         List<String> excludeUrls = Database.getExcludedURLs();
         for (ParseRule rule : Database.getParseRules()) {
@@ -60,7 +60,7 @@ public class Main {
             String title = getTextBySelector(e, rule.getTextSelector());
             String url = getAttrBySelector(e, "href", rule.getUrlSelector());
     
-            if (url.isEmpty()) {
+            if (url.isEmpty() && !title.isEmpty()) {
                 System.err.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
                 continue;
             }
@@ -101,7 +101,11 @@ public class Main {
                 }
                 break;
             default:
-                attribute = element.select(selector).get(0).attr(attr);
+                Elements selected = element.select(selector);
+                if (selected.size() == 0) {
+                    return "";
+                }
+                attribute = selected.get(0).attr(attr);
                 break;
         }
         return attribute;

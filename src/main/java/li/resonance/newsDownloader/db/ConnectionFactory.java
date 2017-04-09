@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class ConnectionFactory {
     private static ConnectionFactory connectionFactory = null;
     
-    private final String dbURL = "jdbc:mysql://localhost:3306/resonance?useSSL=true" + "&useUnicode=true" +
-                                 "&useJDBCCompliantTimezoneShift=true" + "&useLegacyDatetimeCode=false" +
+    private final String dbURL = "jdbc:mysql://localhost:3306/resonance?useSSL=true" +
+                                 "&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false" +
                                  "&serverTimezone=UTC";
     private String dbUser;
     private String dbPwd;
