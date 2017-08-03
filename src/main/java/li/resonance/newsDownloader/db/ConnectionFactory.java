@@ -1,5 +1,7 @@
 package li.resonance.newsDownloader.db;
 
+import li.resonance.newsDownloader.Main;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,13 +19,13 @@ public class ConnectionFactory {
     
     private Connection connection = null;
     
-    private ConnectionFactory() {
-        File cfg = new File("db.cfg");
+    private ConnectionFactory(String configPath) {
+        File cfg = new File(configPath);
         if (!cfg.exists()) {
-            cfg = new File("/home/benji/java/db.cfg");
+            cfg = new File(configPath);
         }
         try (Scanner scan = new Scanner(cfg)) {
-            String[] parts = scan.nextLine().split(";");
+            String[] parts = scan.nextLine().split("\\|");
             dbUser = parts[0];
             dbPwd = parts[1];
         } catch (Exception e) {
@@ -35,7 +37,7 @@ public class ConnectionFactory {
     
     public static ConnectionFactory getInstance() {
         if (connectionFactory == null) {
-            connectionFactory = new ConnectionFactory();
+            connectionFactory = new ConnectionFactory(Main.configPath);
         }
         return connectionFactory;
     }

@@ -28,17 +28,26 @@ import java.util.List;
 
 public class Main {
     
+    public static String configPath = "db.cfg";
+    private static int articles = 0;
+    
     public static void main(String[] args) {
         try {
+            if (args.length > 0 && args[0] != null) {
+                configPath = args[0];
+            } else {
+                System.err.println("Missing config file!");
+                System.exit(1);
+            }
             parseAll();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         ConnectionFactory.getInstance().closeConnection();
-        System.out.println("Goodbye! o/");
+        System.out.println("Indexed " + articles + " articles.");
     }
     
-    static void parseAll() throws IOException {
+    private static void parseAll() throws IOException {
         List<String> excludeUrls = Database.getExcludedURLs();
         for (ParseRule rule : Database.getParseRules()) {
             System.out.println("Fetching " + rule.getSection().getUrl());
@@ -47,12 +56,13 @@ public class Main {
             List<NewsStory> stories = parseDocument(document, rule, excludeUrls);
             System.out.println("Saving...");
             for (NewsStory story : stories) {
+                articles++;
                 Database.registerNewsStory(story);
             }
         }
     }
     
-    static List<NewsStory> parseDocument(Document document, ParseRule rule, List<String> ignoreUrls) {
+    private static List<NewsStory> parseDocument(Document document, ParseRule rule, List<String> ignoreUrls) {
         List<NewsStory> list = new ArrayList<>();
         makeLinksAbsolute(document);
         Elements classes = document.select(rule.getCssSelector());
@@ -61,7 +71,7 @@ public class Main {
             String url = getAttrBySelector(e, "href", rule.getUrlSelector());
     
             if (url.isEmpty() && !title.isEmpty()) {
-                System.err.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
+                System.out.println("No url for title '" + title + "', section '" + rule.getSection().getUrl() + "'!");
                 continue;
             }
             
@@ -84,7 +94,7 @@ public class Main {
         return list;
     }
     
-    static String getAttrBySelector(Element element, String attr, String selector) {
+    private static String getAttrBySelector(Element element, String attr, String selector) {
         String attribute;
         switch (selector) {
             case "self":
@@ -125,7 +135,7 @@ public class Main {
         return "";
     }
     
-    static String getTextBySelector(Element element, String selector) {
+    private static String getTextBySelector(Element element, String selector) {
         String text;
         switch (selector) {
             case "self":
@@ -152,7 +162,7 @@ public class Main {
         return text;
     }
     
-    static void makeLinksAbsolute(Document document) {
+    private static void makeLinksAbsolute(Document document) {
         Elements elements = document.getAllElements();
         for (Element e : elements) {
             if (e.is("a") || e.is("link")) {

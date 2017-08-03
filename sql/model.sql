@@ -1,49 +1,49 @@
-drop database if exists web;
-create database web;
-use web;
+DROP DATABASE IF EXISTS web;
+CREATE DATABASE web;
+USE web;
 
-create table language(
-id int not null primary key auto_increment,
-name varchar(150)
+CREATE TABLE language (
+  id   INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150)
 );
-create table country(
-id int not null primary key auto_increment,
-name varchar(150)
+CREATE TABLE country (
+  id   INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150)
 );
-create table source(
-id int not null primary key auto_increment,
-name varchar(64) not null,
-homepage varchar(255) not null unique,
-language_id int not null,
-country_id int not null,
-foreign key (language_id) references language(id),
-foreign key (country_id) references country(id)
+CREATE TABLE source (
+  id          INT          NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name        VARCHAR(64)  NOT NULL,
+  homepage    VARCHAR(255) NOT NULL UNIQUE,
+  language_id INT          NOT NULL,
+  country_id  INT          NOT NULL,
+  FOREIGN KEY (language_id) REFERENCES language (id),
+  FOREIGN KEY (country_id) REFERENCES country (id)
 );
-create table section(
-id int not null primary key auto_increment,
-name varchar(150) not null,
-url varchar(2083) not null,
-source_id int not null,
-foreign key (source_id) references source(id)
+CREATE TABLE section (
+  id        INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name      VARCHAR(150)  NOT NULL,
+  url       VARCHAR(2083) NOT NULL,
+  source_id INT           NOT NULL,
+  FOREIGN KEY (source_id) REFERENCES source (id)
 );
-create table exclude_urls(
-id int not null primary key auto_increment,
-url varchar(2084) not null
+CREATE TABLE exclude_urls (
+  id  INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  url VARCHAR(2084) NOT NULL
 );
-create table parse_rule(
-  id            int not null primary key auto_increment,
-  section_id    int not null,
-  css_selector  varchar(255) not null,
+CREATE TABLE parse_rule (
+  id            INT          NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  section_id    INT          NOT NULL,
+  css_selector  VARCHAR(255) NOT NULL,
   text_selector VARCHAR(255),
   url_selector  VARCHAR(255),
-foreign key (section_id) references section(id)
+  FOREIGN KEY (section_id) REFERENCES section (id)
 );
 
-create table news_story(
-id int not null primary key auto_increment,
-title varchar(250) not null,
-recorded timestamp not null default current_timestamp(),
-url varchar(2083) not null,
-section_id int not null,
-foreign key (section_id) references section(id)
+CREATE TABLE news_story (
+  id         INT           NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  title      VARCHAR(1024) NOT NULL,
+  recorded   TIMESTAMP     NOT NULL             DEFAULT current_timestamp(),
+  url        VARCHAR(2083) NOT NULL,
+  section_id INT           NOT NULL,
+  FOREIGN KEY (section_id) REFERENCES section (id)
 );
